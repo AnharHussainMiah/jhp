@@ -1,0 +1,13 @@
+<h1>Hello World!</h1>
+
+<h2>My Thoughts:</h2>
+
+<?jhp
+
+const data = ["avacado", "plum", "strawberry", "mango", "banana", "cherry", "apple"];
+
+for(var i in data) {
+    console.log(data[i] + "<br/>");
+}
+
+?>
