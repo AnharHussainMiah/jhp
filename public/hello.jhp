@@ -1,3 +1,3 @@
 <h1>Welcome!</h1>
-<?jhp  const name = "this is aserioulsy bad idea!"; ?>
+<?jhp  const name = "this is a serioulsy bad idea!"; ?>
 <p> Hello, <?jhp console.log(name); ?>.</p>

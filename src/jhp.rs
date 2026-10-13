@@ -1,8 +1,10 @@
 use quick_js::Context;
 
 pub fn compile(text: &str) -> String {
-    let mut is_text_mode: bool = true;
+    let chars: Vec<char> = text.chars().collect();
+    let mut is_code_mode: bool = false;
     let mut buffer = String::new();
+    let mut cursor: usize = 0;
 
     buffer.push_str(
         r#"
@@ -16,65 +18,105 @@ pub fn compile(text: &str) -> String {
     "#,
     );
 
-    let lines: Vec<&str> = text.split("\n").collect();
+    buffer.push('c');
+    buffer.push('o');
+    buffer.push('n');
+    buffer.push('s');
+    buffer.push('o');
+    buffer.push('l');
+    buffer.push('e');
+    buffer.push('.');
+    buffer.push('l');
+    buffer.push('o');
+    buffer.push('g');
+    buffer.push('(');
+    buffer.push('"');
 
-    for line in lines {
-        if line.contains("<?jhp") && !line.contains("?>") {
-            let transformed = line.replace("<?jhp", "')");
-            buffer.push_str(&format!("console.log('{}\n", transformed));
-            is_text_mode = false;
-            continue;
+    while cursor < chars.len() {
+        let peek_ch1 = chars.get(cursor + 0).copied(); // <
+        let peek_ch2 = chars.get(cursor + 1).copied(); // ?
+        let peek_ch3 = chars.get(cursor + 2).copied(); // j
+        let peek_ch4 = chars.get(cursor + 3).copied(); // h
+        let peek_ch5 = chars.get(cursor + 4).copied(); // p
+
+        if peek_ch1 == Some('<')
+            && peek_ch2 == Some('?')
+            && peek_ch3 == Some('j')
+            && peek_ch4 == Some('h')
+            && peek_ch5 == Some('p')
+        {
+            is_code_mode = true;
+            cursor += 5;
+
+            buffer.push('"');
+            buffer.push(')');
+            buffer.push(';');
         }
 
-        if !line.contains("<?jhp") && line.contains("?>") {
-            let transformed = line.replace("?>", "");
-            buffer.push_str(&format!("{}\n", transformed));
-            is_text_mode = true;
-            continue;
+        if peek_ch1 == Some('?') && peek_ch2 == Some('>') {
+            is_code_mode = false;
+            cursor += 2;
+
+            buffer.push('\n');
+            buffer.push('c');
+            buffer.push('o');
+            buffer.push('n');
+            buffer.push('s');
+            buffer.push('o');
+            buffer.push('l');
+            buffer.push('e');
+            buffer.push('.');
+            buffer.push('l');
+            buffer.push('o');
+            buffer.push('g');
+            buffer.push('(');
+            buffer.push('"');
         }
 
-        if line != "<?jhp" && line != "?>" {
-            if is_text_mode {
-                if line.contains("<?jhp") && line.contains("?>") {
-                    let tokens: Vec<char> = line.chars().collect();
-                    let mut index = 0;
-                    let mut is_text = true;
+        if !is_code_mode {
+            if peek_ch1 == Some('\n') {
+                // inject our closing e.g
+                // ")\n
+                // console.log("
 
-                    if !line.starts_with("<?jhp") {
-                        buffer.push_str(&format!("console.log('"));
-                    }
+                buffer.push('"');
+                buffer.push(')');
+                buffer.push(';');
+                buffer.push('\n');
+                buffer.push('c');
+                buffer.push('o');
+                buffer.push('n');
+                buffer.push('s');
+                buffer.push('o');
+                buffer.push('l');
+                buffer.push('e');
+                buffer.push('.');
+                buffer.push('l');
+                buffer.push('o');
+                buffer.push('g');
+                buffer.push('(');
+                buffer.push('"');
+            }
 
-                    while index < tokens.len() {
-                        if tokens[index..].starts_with(&['<', '?', 'j', 'h', 'p']) {
-                            is_text = false;
-                            buffer.push_str(&format!("');"));
-                            buffer.push_str(&tokens[index].to_string());
-                            index += 4;
-                            continue;
-                        }
+            let peek_ch1 = chars.get(cursor + 0).copied(); // cursor has been moved, yeah yeah shadowing is bad I know ;)
 
-                        if tokens[index..].starts_with(&['?', '>']) {
-                            is_text = true;
-                            buffer.push_str(&format!("console.log('"));
-                            buffer.push_str(&tokens[index].to_string());
-                            index += 2;
-                            continue;
-                        }
-
-                        buffer.push_str(&tokens[index].to_string());
-                        index += 1;
-                    }
-
-                    if is_text {
-                        buffer.push_str(&format!("');"));
-                    }
-                } else {
-                    buffer.push_str(&format!("console.log('{}');\n", line));
-                }
-            } else {
-                buffer.push_str(&format!("{}\n", line));
+            if cursor < chars.len() && peek_ch1 != Some('\n') {
+                buffer.push(chars[cursor]);
+            }
+        } else {
+            if cursor < chars.len() {
+                buffer.push(chars[cursor]);
             }
         }
+
+        cursor += 1;
+    }
+
+    if !is_code_mode {
+        buffer.push('"');
+        buffer.push(')');
+        buffer.push(';');
+        buffer.push('\n');
     }
 
     buffer.push_str(
