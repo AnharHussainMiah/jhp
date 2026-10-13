@@ -4,18 +4,18 @@
 
 ## Kinda like PHP but with JavaScript instead...
 
-I got up one morning thinking, us devs hate JavaScript and we also hate PHP, so what if we had something like PHP, but instead of PHP we could write it in JavaSciptt? and thus JHP was born!
+I got up one morning thinking, us devs hate JavaScript and we also hate PHP, what if we combined them together so that we had something that worked like PHP but was written using JavaScript as the templating language? and thus JHP was born!
 
-It's pretty much as you would expect it!
+And it pretty much works as you would expect it!
 
-## Enough talk, show me the code!
+## Ok enough talk, show me the code!
 
-Instead of having `.php` files we have `.jhp` files instead, and they work almost the same way, just dump
+Instead of having `.php` files we have `.jhp` files, and they work almost the same way, just dump
 your "website" files into a `public` folder including all your `.jhp` files.
 
 **Example:**
 
-A `index.jhp` file can contain normal HTML with JavaScript embedded wherever you need it:
+A `index.jhp` file can contain normal HTML with JavaScript embedded wherever you need it just like in PHP:
 
 ```html
 <h1>Welcome!</h1>
@@ -25,10 +25,10 @@ A `index.jhp` file can contain normal HTML with JavaScript embedded wherever you
 <p>Hello, <?jhp console.log(name); ?>.</p>
 ```
 
-assuming you have the `jhp` binary compiled installed on your machine, as long as the `public` folder is in your
+assuming you have the `jhp` binary compiled and installed on your machine, as long as the `public` folder is in your
 current directory just run `jhp` and it will start serving the `public` folder.
 
-And now nagivate to it in your browser `http://localhost:8080/hello.jhp` and bask in the glory that is `JHP` rendered goodness.
+And now nagivate to it in your browser `http://localhost:8080/index.jhp` and bask in the glory that is `JHP` rendered goodness.
 
 Another example `fruits.jhp` :
 
@@ -66,10 +66,10 @@ If your JavaScript has an error, then you'll get a glorious animated Amiga 500 `
 - [ ] Handle "Import" Pragmas _(will need to recursively walk and handle cycle detection)_
 
 In theory once all the above features are completed, `jhp` could realistically be used to build
-pretty much fully featured Web Application. It would be tototally hilarious is someone used it to
-re-create WordPress using `jhp`
+pretty much any fully featured Web Application. It would be tototally hilarious if someone used it to
+port WordPress using `jhp`
 
-## Production Use
+## Can I use in production?
 
 TL;DR
 
