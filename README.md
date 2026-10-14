@@ -1,6 +1,6 @@
 # JHP: JavaScript Hypertext Processor
 
-![](jhp-logo.jpg)
+![](logo.jpg)
 
 ## Kinda like PHP but with JavaScript instead...
 
