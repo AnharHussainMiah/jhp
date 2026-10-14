@@ -1,5 +1,56 @@
 use quick_js::Context;
 
+use std::collections::HashMap;
+use quick_js::JsValue;
+
+struct JHPResponse {
+    status: u16,
+    headers: HashMap<String, String>,
+    body: String,
+}
+
+impl TryFrom<JsValue> for JHPResponse {
+    type Error = String;
+
+    fn try_from(value: JsValue) -> Result<Self, Self::Error> {
+        let mut object = match value {
+            JsValue::Object(object) => object,
+            _ => return Err("Expected response object".into()),
+        };
+
+        let status = match object.remove("status") {
+            Some(JsValue::Int(n)) => {
+                u16::try_from(n).map_err(|_| "Invalid status code")?
+            }
+            _ => return Err("Missing or invalid status".into()),
+        };
+
+        let headers = match object.remove("headers") {
+            Some(JsValue::Object(headers)) => {
+                headers
+                    .into_iter()
+                    .map(|(key, value)| match value {
+                        JsValue::String(value) => Ok((key, value)),
+                        _ => Err(format!("Header '{key}' must be a string")),
+                    })
+                    .collect::<Result<HashMap<String, String>, String>>()?
+            }
+            _ => return Err("Missing or invalid headers".into()),
+        };
+
+        let body = match object.remove("body") {
+            Some(JsValue::String(body)) => body,
+            _ => return Err("Missing or invalid body".into()),
+        };
+
+        Ok(JHPResponse {
+            status,
+            headers,
+            body,
+        })
+    }
+}
+
 pub fn compile(text: &str) -> String {
     let chars: Vec<char> = text.chars().collect();
     let mut is_code_mode: bool = false;
@@ -8,6 +59,15 @@ pub fn compile(text: &str) -> String {
 
     buffer.push_str(
         r#"
+    RESPONSE = {
+        status: 200,
+            headers: {
+                "content-type": "text/html; charset=utf-8",
+                "cache-control": "no-cache"
+            },
+            body: ''
+    };
+
     globalThis.__consoleOutput = "";
 
     globalThis.console = {
@@ -121,7 +181,8 @@ pub fn compile(text: &str) -> String {
 
     buffer.push_str(
         r#"
-    globalThis.__consoleOutput;
+    RESPONSE.body = globalThis.__consoleOutput;
+    RESPONSE;
     "#,
     );
 
@@ -130,7 +191,20 @@ pub fn compile(text: &str) -> String {
 
 pub fn js(jhp: String) -> Result<String, Box<dyn std::error::Error>> {
     let ctx = Context::new()?;
-    let result = ctx.eval_as::<String>(&jhp)?;
-    // println!("{result}");
-    Ok(result)
+
+    // lets test out some host functions:
+
+    ctx.add_callback("stdout", |m: String| {
+        println!("STDOUT -> {}", m);
+        m
+    })?;
+
+    ctx.add_callback("httpGet", |m: String| {
+        format!("you said -> {}",m)
+    })?;
+
+    let result = ctx.eval(&jhp)?;
+    let response = JHPResponse::try_from(result)?;
+
+    Ok(response.body)
 }

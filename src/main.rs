@@ -1,6 +1,7 @@
 use axum::{
     Router,
     body::Body,
+    body::to_bytes,
     http::{Request, StatusCode},
     response::Response,
     routing::any,
@@ -59,7 +60,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, StatusCode
         .and_then(|extension| extension.to_str())
         == Some("jhp")
     {
-        return handle_jhp(&file_path).await;
+        return handle_jhp(&file_path, req).await;
     }
 
     let data = fs::read(&file_path)
@@ -74,12 +75,15 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, StatusCode
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
-async fn handle_jhp(path: &Path) -> Result<Response<Body>, StatusCode> {
+async fn handle_jhp(path: &Path, req: Request<Body>) -> Result<Response<Body>, StatusCode> {
     let source = fs::read_to_string(path)
         .await
         .map_err(|_| StatusCode::NOT_FOUND)?;
 
-    let processed = process_jhp(&source).await?;
+
+    // TODO: return a proper JHPResponse so we can map the 
+    // the status, headers, and body
+    let processed = process_jhp(&source, req).await?;
 
     Response::builder()
         .header("content-type", "text/html; charset=utf-8")
@@ -87,8 +91,48 @@ async fn handle_jhp(path: &Path) -> Result<Response<Body>, StatusCode> {
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
-async fn process_jhp(source: &str) -> Result<String, StatusCode> {
+async fn process_jhp(source: &str, req: Request<Body>) -> Result<String, StatusCode> {
     let compiled = compile(source);
+
+    let mut json = serde_json::Map::new();
+
+    let headers = req.headers();
+    let uri = req.uri();
+
+    for (name, value) in headers {
+        json.insert(
+            name.to_string(),
+            serde_json::Value::String(
+                value.to_str().unwrap_or("").to_string(),
+            ),
+        );
+    }
+
+    let header_data = serde_json::to_string(&serde_json::Value::Object(json)).unwrap();
+
+    let env_map: serde_json::Map<String, serde_json::Value> =
+        std::env::vars()
+            .map(|(key, value)| {
+                (key, serde_json::Value::String(value))
+            })
+            .collect();
+
+    let env = serde_json::to_string(&env_map).unwrap_or_default();
+
+    let compiled = format!("METHOD = '{}';\n", req.method()) + &compiled;
+    let compiled = format!("URI = '{}';\n", uri) + &compiled;
+    let compiled = format!("PATH = '{}';\n", uri.path()) + &compiled;
+    let compiled = format!("QUERYSTRING = '{}';\n", uri.query().unwrap_or("")) + &compiled;
+    let compiled = format!("ENV = {};\n", env) + &compiled;
+    let compiled = format!("HEADERS = {};\n", header_data) + &compiled;
+
+
+    // ugh some nasty stuff, will need to clean up later
+
+    let bytes = to_bytes(req.into_body(), 1024 * 1024).await.unwrap(); // max body is 1MB
+    let body = String::from_utf8(bytes.to_vec()).unwrap();
+
+    let compiled = format!("BODY = '{}';\n", body) + &compiled;
 
     let jhp = jhp::js(compiled.clone()).unwrap_or_else(|e| {
         let error = guru::error(&e.to_string());

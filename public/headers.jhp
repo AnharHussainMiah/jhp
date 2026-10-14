@@ -1,0 +1,37 @@
+<h1>Headers</h1>
+<?jhp
+
+const headers = JSON.stringify(HEADERS);
+console.log(headers);
+
+?>
+<br/>
+<h1>Uri</h1>
+
+<ul>
+    <li><?jhp console.log(METHOD); ?></li>
+    <li><?jhp console.log(URI); ?></li>
+    <li><?jhp console.log(PATH); ?></li>
+    <li><?jhp console.log(QUERYSTRING); ?></li>
+</ul>
+
+<h1>ENV</h1>
+
+<?jhp
+
+const enviro = JSON.stringify(ENV);
+console.log(enviro);
+console.log("<br/><br/>");
+
+// a specific header value
+console.log(ENV["CARGO"]);
+
+?>
+
+<h1>Body</h1>
+
+<?jhp
+
+console.log(BODY);
+
+?>
