@@ -1,12 +1,12 @@
 use quick_js::Context;
 
-use std::collections::HashMap;
 use quick_js::JsValue;
+use std::collections::HashMap;
 
-struct JHPResponse {
-    status: u16,
-    headers: HashMap<String, String>,
-    body: String,
+pub struct JHPResponse {
+    pub status: u16,
+    pub headers: HashMap<String, String>,
+    pub body: String,
 }
 
 impl TryFrom<JsValue> for JHPResponse {
@@ -19,22 +19,18 @@ impl TryFrom<JsValue> for JHPResponse {
         };
 
         let status = match object.remove("status") {
-            Some(JsValue::Int(n)) => {
-                u16::try_from(n).map_err(|_| "Invalid status code")?
-            }
+            Some(JsValue::Int(n)) => u16::try_from(n).map_err(|_| "Invalid status code")?,
             _ => return Err("Missing or invalid status".into()),
         };
 
         let headers = match object.remove("headers") {
-            Some(JsValue::Object(headers)) => {
-                headers
-                    .into_iter()
-                    .map(|(key, value)| match value {
-                        JsValue::String(value) => Ok((key, value)),
-                        _ => Err(format!("Header '{key}' must be a string")),
-                    })
-                    .collect::<Result<HashMap<String, String>, String>>()?
-            }
+            Some(JsValue::Object(headers)) => headers
+                .into_iter()
+                .map(|(key, value)| match value {
+                    JsValue::String(value) => Ok((key, value)),
+                    _ => Err(format!("Header '{key}' must be a string")),
+                })
+                .collect::<Result<HashMap<String, String>, String>>()?,
             _ => return Err("Missing or invalid headers".into()),
         };
 
@@ -189,7 +185,7 @@ pub fn compile(text: &str) -> String {
     buffer.to_string()
 }
 
-pub fn js(jhp: String) -> Result<String, Box<dyn std::error::Error>> {
+pub fn js(jhp: String) -> Result<JHPResponse, Box<dyn std::error::Error>> {
     let ctx = Context::new()?;
 
     // lets test out some host functions:
@@ -199,12 +195,10 @@ pub fn js(jhp: String) -> Result<String, Box<dyn std::error::Error>> {
         m
     })?;
 
-    ctx.add_callback("httpGet", |m: String| {
-        format!("you said -> {}",m)
-    })?;
+    ctx.add_callback("httpGet", |m: String| format!("you said -> {}", m))?;
 
     let result = ctx.eval(&jhp)?;
     let response = JHPResponse::try_from(result)?;
 
-    Ok(response.body)
+    Ok(response)
 }

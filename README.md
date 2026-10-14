@@ -95,6 +95,31 @@ The body payload is available in the `BODY` super global _(please note 1mb max s
 console.log(BODY);
 ```
 
+## Returning custom headers and HTTP Status Code
+
+There is a super global object called `RESPONSE` that has the following stucture:
+
+```json
+RESPONSE = {
+        status: 200,
+            headers: {
+                "content-type": "text/html; charset=utf-8",
+                "cache-control": "no-cache"
+            },
+            body: ''
+    };
+```
+
+Simply mutate this object to set the status code and headers, example:
+
+```javascript
+RESPONSE.status = 404;
+RESPONSE.headers["x-custom-header"] = "some custom value here";
+```
+
+Note: doing `console.log` appends to the `RESPONSE.body` automatically, so this does not need to be mutated
+manually, unless you wanted to forcefully overide the template parsing.
+
 ## Error screenshot
 
 If your JavaScript has an error, then you'll get a glorious animated Amiga 500 `Guru Meditation` warning:
@@ -103,11 +128,12 @@ If your JavaScript has an error, then you'll get a glorious animated Amiga 500 `
 
 ## What's left
 
+**Mandatory**
+
 - [ ] Create host http get/post functions
 - [x] Inject server "variables" e.g headers, querystring and other meta information
-- [ ] Handle writing headers, and http statuses
+- [x] Handle writing headers, and http statuses
 - [ ] Host database function _(probably postgresql?)_
-- [ ] Handle caching once parsed
 - [ ] File I/O
 - [ ] Host function to print to `stdout`
 - [ ] Handle "Import" Pragmas _(will need to recursively walk and handle cycle detection)_
@@ -115,6 +141,10 @@ If your JavaScript has an error, then you'll get a glorious animated Amiga 500 `
 In theory once all the above features are completed, `jhp` could realistically be used to build
 pretty much any fully featured Web Application. It would be tototally hilarious if someone used it to
 port WordPress using `jhp`
+
+**Nice to Have**
+
+- [ ] Handle caching once parsed
 
 ## Was AI used?
 
@@ -126,6 +156,6 @@ You can tell if you read the codebase, it's not a bazillion lines of random code
 The `license` is the new `Contextual Copyleft AI (CCAI) License v1.0`, because why should big tech hoover everything up without
 proper attribution _(aka stealing)_, but when others "distill" their models they get all angry?
 
-## Can I use in production?
+## Can I use this in production?
 
 TL;DR **Don't**

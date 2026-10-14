@@ -33,5 +33,6 @@ console.log(ENV["CARGO"]);
 <?jhp
 
 console.log(BODY);
-
+RESPONSE.status = 201;
+RESPONSE.headers["x-custom-header"] = "you rock!";
 ?>
