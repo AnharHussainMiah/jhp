@@ -1,8 +1,10 @@
 use quick_js::Context;
 
+use crate::host;
 use quick_js::JsValue;
 use std::collections::HashMap;
 
+#[derive(serde::Serialize)]
 pub struct JHPResponse {
     pub status: u16,
     pub headers: HashMap<String, String>,
@@ -188,14 +190,36 @@ pub fn compile(text: &str) -> String {
 pub fn js(jhp: String) -> Result<JHPResponse, Box<dyn std::error::Error>> {
     let ctx = Context::new()?;
 
-    // lets test out some host functions:
-
-    ctx.add_callback("stdout", |m: String| {
-        println!("STDOUT -> {}", m);
+    ctx.add_callback("LOG", |m: String| {
+        println!("STDOUT| {}", m);
         m
     })?;
 
-    ctx.add_callback("httpGet", |m: String| format!("you said -> {}", m))?;
+    /*
+        File I/O
+
+        Some perl inspiration here:
+
+         * "slurp" : read a file given a file name e.g SLURP("foo.txt")
+         * "spew"  : write a new file e.g SPEW("bar.txt", "some data here!")
+         * "pour"  : append to an existing file, but create a new one if one does not exist e.g POUR("baz.txt", "another line")
+
+    */
+
+    ctx.add_callback("SLURP", |m: String| host::slurp(m))?;
+    ctx.add_callback("SPEW", |f: String, c: String| host::spew(f, c))?;
+    ctx.add_callback("POUR", |f: String, c: String| host::pour(f, c))?;
+
+    /*
+        Http Get + Post
+
+        * Fetch (url, headers): empty string on failure, or json string, need to parse into json
+        * Post (url, headers, body): same as above
+
+    */
+
+    ctx.add_callback("FETCH", |u: String, h: String| host::fetch(u, h))?;
+    ctx.add_callback("POST", |u: String, h: String, b: String| host::post(u, h, b))?;
 
     let result = ctx.eval(&jhp)?;
     let response = JHPResponse::try_from(result)?;

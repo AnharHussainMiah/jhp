@@ -1,0 +1,18 @@
+<h1>HTTP Host Functions!</h1>
+
+<?jhp
+
+
+const result = FETCH("https://httpbin.org/get", '{}');
+console.log(result);
+
+?>
+
+<h1>POST</h1>
+
+<?jhp
+
+const result2 = POST("https://httpbin.org/post", '{}', "this is a test!");
+console.log(result2);
+
+?>

@@ -15,6 +15,7 @@ use std::{
 use std::collections::HashMap;
 
 mod guru;
+mod host;
 mod jhp;
 
 use crate::jhp::{JHPResponse, compile};
