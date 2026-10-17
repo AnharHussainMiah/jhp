@@ -219,7 +219,9 @@ pub fn js(jhp: String) -> Result<JHPResponse, Box<dyn std::error::Error>> {
     */
 
     ctx.add_callback("FETCH", |u: String, h: String| host::fetch(u, h))?;
-    ctx.add_callback("POST", |u: String, h: String, b: String| host::post(u, h, b))?;
+    ctx.add_callback("POST", |u: String, h: String, b: String| {
+        host::post(u, h, b)
+    })?;
 
     let result = ctx.eval(&jhp)?;
     let response = JHPResponse::try_from(result)?;

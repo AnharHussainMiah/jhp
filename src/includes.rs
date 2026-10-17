@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+
+use crate::host::slurp;
 
 #[derive(Debug)]
 struct Include {
@@ -7,18 +10,12 @@ struct Include {
     children: Vec<Include>,
 }
 
-
-// fn main() {
-//     let resolved = resolve_include_imports(
-//         &slurp("sandbox/main.txt"),
-//         &generate_includes_graph("main.txt", &mut HashSet::new()),
-//     );
-
-//     println!("{}", resolved);
-// }
-
 pub fn resolve(f: &str) -> String {
-
+    let resolved = resolve_include_imports(
+        &slurp(f.to_string()),
+        &generate_includes_graph(&f, &mut HashSet::new()),
+    );
+    resolved
 }
 
 fn resolve_include_imports(content: &str, includes: &[Include]) -> String {
@@ -27,7 +24,7 @@ fn resolve_include_imports(content: &str, includes: &[Include]) -> String {
 
     for include in includes {
         output.push_str(&content[cursor..include.start_position]);
-        let child_content = slurp(&format!("{}/{}", pwd, &include.name));
+        let child_content = slurp(include.name.clone());
         let expanded_content = resolve_include_imports(&child_content, &include.children);
         output.push_str(&expanded_content);
         cursor = include.end_position;
@@ -42,22 +39,22 @@ fn generate_includes_graph(filename: &str, current_path: &mut HashSet<String>) -
         return Vec::new();
     }
 
-    let mut nodes = extract_includes(filename);
+    let mut includes = extract_includes(filename);
 
-    nodes.retain_mut(|node| {
-        if current_path.contains(&node.name) {
+    includes.retain_mut(|include| {
+        if current_path.contains(&include.name) {
             return false;
         }
-        node.children = generate_includes_graph(&node.name, current_path);
+        include.children = generate_includes_graph(&include.name, current_path);
         true
     });
 
     current_path.remove(filename);
-    nodes
+    includes
 }
 
 fn extract_includes(f: &str) -> Vec<Include> {
-    let content = slurp(&format!("sandbox/{}", f));
+    let content = slurp(f.to_string());
     let chars: Vec<char> = content.chars().collect();
 
     let mut include_stack: Vec<Include> = Vec::new();
@@ -105,21 +102,4 @@ fn extract_includes(f: &str) -> Vec<Include> {
         }
     }
     include_stack
-}
-
-
-/// hmm, maybe use the host slurp as that already handles base pwd??
-fn slurp(f: &str) -> String {
-    std::fs::read_to_string(f).unwrap_or_else(|e| {
-        println!("ERR| unable to read file '{}'", f);
-        "".to_string()
-    })
-}
-
-fn pwd() -> String {
-    let pwd = env::current_dir().unwrap_or_else(|e| {
-        println!("ERR| unable to get the current directory!");
-        "".to_string()
-    });
-    format!("{}", pwd.display())
 }

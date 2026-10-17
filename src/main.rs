@@ -16,6 +16,7 @@ use std::collections::HashMap;
 
 mod guru;
 mod host;
+mod includes;
 mod jhp;
 
 use crate::jhp::{JHPResponse, compile};
@@ -98,7 +99,8 @@ async fn handle_jhp(path: &Path, req: Request<Body>) -> Result<Response<Body>, S
 }
 
 async fn process_jhp(source: &str, req: Request<Body>) -> Result<JHPResponse, StatusCode> {
-    let compiled = compile(source);
+    let resolved = includes::resolve(&source);
+    let compiled = compile(&resolved);
 
     let mut json = serde_json::Map::new();
 
