@@ -2,23 +2,28 @@
 
 ![](logo.jpg)
 
+![OS](https://img.shields.io/badge/OS-Linux%20%7C%20Mac%20%7C%20WSL-blue)
+![License](https://img.shields.io/badge/License-CCAI%20License%20v1.0-green)
+![Release](https://img.shields.io/badge/Release-v0.1.0-pink)
+![Language](https://img.shields.io/badge/Language-Rust-orange)
+
 ## Kinda like PHP but with JavaScript instead...
 
 I got up one morning thinking, us devs hate JavaScript and PHP, what if we combined them together so that we had something that worked just like PHP but with JavaScript as the templating language instead? and thus JHP was born!
 
-And it pretty much works as you would expect it!
+And works pretty much as you would expect it!
 
 ## But serioulsy why?!
 
-On a semi serious note, `jhp` at the moment compiles down to around 3mb, although I haven't tried compiling under alpine, imagine building the container image, it could be end up under 10mb! compare that to a `php` container image and it's around 400mb, you can get that down to around 150-200mb if you use something like Alpine + Nginx and lots of elbow grease, but honestly that's still huge!
+On a semi serious note, `jhp` at the moment compiles down to around ~~3mb~~ 7mb, although I haven't tried compiling under alpine, imagine building a full blown web app server container image that's under 10mb! and now compare that to a `php` container image and its around 400mb. You can get that down to around 150-200mb if you use something like Alpine + Nginx and lots of elbow grease, but honestly that's still huge!
 
-Using Node, Deno or Bun is kinda bad as well, with Node + Alpine around 250mb, while with Deno and Bun can be squeezed to around 50mb, but that's still big!
+Using Node, Deno or Bun is kinda bad as well, with Node + Alpine its around 250mb, while Deno and Bun can be squeezed further to around 50mb, but that's still big!
 
-Size aside we get to use vanilla JavaScript, perhaps this was what `nodejs` was really supposed to be :D
+Size issues aside, the other main point is we get to use vanilla JavaScript on the server side, maybe this was what `nodejs` should've been like? 😂
 
 ## Ok enough talk, show me the code!
 
-Instead of having `.php` files we have `.jhp` files, and they work almost the same way, instead of using `<?php` tags, use `<?jhp` and instead of writing `php` we write vanilla JavaScript and then just dump
+Instead of having `.php` files we have `.jhp` files, and they work the same way, instead of using `<?php` tags, use `<?jhp` and instead of writing `php` we write vanilla JavaScript and then just dump
 the "website" files into a `public` folder including all your `.jhp` files.
 
 **Example:**
@@ -34,9 +39,27 @@ A `index.jhp` file can contain normal HTML with JavaScript embedded anywhere you
 ```
 
 assuming you have the `jhp` binary compiled and installed on your machine, as long as the `public` folder is in your
-current directory just run `jhp` and it will start serving the `public` folder.
+current directory just run `jhp` and it will start serving the `public` folder, you should see `jhp` booted up:
 
-And now nagivate to it in your browser `http://localhost:8080/index.jhp` and bask in the glory that is `JHP` rendered goodness.
+```shell
+
+
+            ╔═══╗ ╔═╗   ╔═╗ ╔═══════╗
+            ╚═╗ ║ ║ ║   ║ ║ ║ ╔═══╗ ║
+              ║ ║ ║ ╚═══╝ ║ ║ ╚═══╝ ║
+        ╔═╗   ║ ║ ║ ╔═══╗ ║ ║ ╔═════╝
+        ║ ╚═══╝ ║ ║ ║   ║ ║ ║ ║
+        ╚═══════╝ ╚═╝   ╚═╝ ╚═╝
+
+    What nodejs should've been (maybe?)
+                v0.1.0
+
+
+Serving ./public on http://0.0.0.0:8080
+
+```
+
+And now nagivate to it in your browser `http://localhost:8080/index.jhp` and bask in the glory that is `JHP` rendered awesomeness.
 
 Another example `fruits.jhp` :
 
@@ -102,13 +125,13 @@ There is a super global object called `RESPONSE` that has the following stucture
 
 ```json
 {
-    status: 200,
-    headers: {
-        "content-type": "text/html; charset=utf-8",
-        "cache-control": "no-cache"
-    },
-    body: ''
-};
+  "status": 200,
+  "headers": {
+    "content-type": "text/html; charset=utf-8",
+    "cache-control": "no-cache"
+  },
+  "body": ""
+}
 ```
 
 Simply mutate this object to set the status code and headers that you want to return to the client browser, example:
@@ -212,6 +235,24 @@ POUR("log.txt", "some more logging");
 POUR("log.txt", "evn more logging!");
 ```
 
+## Imports aka "includes"
+
+`jhp` wouldn't be complete without `php` "include" style template imports.
+
+In `jhp` the syntax to include or "import" another `jhp` file into the current file is to use the following
+syntax:
+
+```html
+<# components/button.jhp #>
+```
+
+This behaves the same as `php`'s "include" however unlike `php` this automatically detects
+cyclic references and simply stops processing them if there are infinite cycles, this is why we
+don't need to worry about `include` vs `include_once` etc in `jhp`.
+
+> [!NOTE]
+> **IMPORTANT:** when pointing to a file you must use the "absolute" path from relative from the `public` folder. So for example if you had a file that was `public/lib/util.jhp` then that file would always be referenced as `<# lib/util.jhp #>`, this helps remove all the annoying issues in `php` when files are moved that end up breaking relative imports, hopefully this is way saner and consitent!
+
 ## Error screenshot
 
 If your JavaScript has an error, then you'll get a glorious animated Amiga 500 `Guru Meditation` warning:
@@ -227,8 +268,8 @@ If your JavaScript has an error, then you'll get a glorious animated Amiga 500 `
 - [x] Host function to print to `stdout`
 - [x] File I/O _(read, write, append)_
 - [x] Create host http get/post functions
+- [x] Handle "Import" Pragmas _(will need to recursively walk and handle cycle detection)_
 - [ ] Host database function _(probably PostgreSQL?)_
-- [ ] Handle "Import" Pragmas _(will need to recursively walk and handle cycle detection)_
 
 In theory once all the above features are completed, `jhp` could realistically be used to build
 pretty much any fully featured Web Application. It would be tototally hilarious if someone used it to
@@ -236,6 +277,7 @@ create something WordPress using `jhp`
 
 **Nice to Have**
 
+- [ ] Visual Studio extension for `jhp`
 - [ ] Handle caching once parsed
 
 # Quick Start
@@ -281,7 +323,7 @@ just fine, there isn't any Linux specific calls at the moment.
 
 Of course, you could also just use WSL and that should work just fine.
 
-MacOS mostly likely will work fine given its a \*nix OS _(assuming it compiles)_.
+MacOS most likely will work fine given its a \*nix family _(assuming it compiles)_.
 
 ## Hey it doesn't have host function X?
 
@@ -290,3 +332,13 @@ raise a GitHub issue, if it's really popular I might be able to add it, or even 
 ## Can I use this in production?
 
 TL;DR **Don't**
+
+## Contributions
+
+Always welcome, but just a few things:
+
+- You actually know Rust, please I don't want AI slop spam.
+- It has to be useful to a lot of people, not something that might be cool.
+- Please follow the existing codebase style! I like simple flat modules, with very little abstraction.
+- If you build a large feature, you own it.
+- I don't mind _some_ AI use if used tastefully, but as per the previous statement, I take the Linus Torvalds approach: you submit the code, you _own_ the code, that means if things break it's your responsibility.

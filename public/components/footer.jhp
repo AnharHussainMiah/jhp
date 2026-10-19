@@ -1,0 +1,6 @@
+<?jhp
+
+const year = new Date().getFullYear();
+
+?>
+<small> JHP, copyright <?jhp console.log(`(${year})`) ?>

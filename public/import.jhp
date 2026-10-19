@@ -1,0 +1,9 @@
+<# components/header.jhp #>
+
+<p>Some amazing content:</p> 
+
+<# components/button.jhp #>
+
+<b>And now the footer:</b>
+
+<# components/footer.jhp #>

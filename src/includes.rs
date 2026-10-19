@@ -54,7 +54,10 @@ fn generate_includes_graph(filename: &str, current_path: &mut HashSet<String>) -
 }
 
 fn extract_includes(f: &str) -> Vec<Include> {
+    // println!("DEBUG| attempting to extract '{}'", f);
+
     let content = slurp(f.to_string());
+ 
     let chars: Vec<char> = content.chars().collect();
 
     let mut include_stack: Vec<Include> = Vec::new();
@@ -84,7 +87,7 @@ fn extract_includes(f: &str) -> Vec<Include> {
             include_stack.push(Include {
                 start_position: include_start,
                 end_position: include_end,
-                name: include_name.trim().to_string(),
+                name: format!("public/{}", include_name.trim().to_string()),
                 children: Vec::new(),
             });
 
