@@ -9,7 +9,7 @@ pub fn slurp(m: String) -> String {
     let mut content = String::new();
     if let Ok(path) = env::current_dir() {
         let base_path = format!("{}", path.display());
-        if let Ok(data) = fs::read_to_string(format!("{}/public/{}", base_path, m)) {
+        if let Ok(data) = fs::read_to_string(format!("{}/{}", base_path, m)) {
             content = data;
         } else {
             println!("ERR| unbale to read content: '{}'", m);

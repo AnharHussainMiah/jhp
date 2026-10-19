@@ -18,6 +18,7 @@ mod guru;
 mod host;
 mod includes;
 mod jhp;
+mod logo;
 
 use crate::jhp::{JHPResponse, compile};
 use tokio::fs;
@@ -26,6 +27,8 @@ const ROOT: &str = "./public";
 
 #[tokio::main]
 async fn main() {
+    println!("{}", logo::render());
+
     let app = Router::new().fallback(any(handle_request));
 
     let addr: SocketAddr = "0.0.0.0:8080".parse().unwrap();
@@ -84,7 +87,9 @@ async fn handle_jhp(path: &Path, req: Request<Body>) -> Result<Response<Body>, S
         .await
         .map_err(|_| StatusCode::NOT_FOUND)?;
 
-    let processed = process_jhp(&source, req).await?;
+
+    let resolved = includes::resolve(&format!("{}", path.display()));
+    let processed = process_jhp(&resolved, req).await?;
 
     let mut builder = Response::builder();
 
@@ -99,8 +104,7 @@ async fn handle_jhp(path: &Path, req: Request<Body>) -> Result<Response<Body>, S
 }
 
 async fn process_jhp(source: &str, req: Request<Body>) -> Result<JHPResponse, StatusCode> {
-    let resolved = includes::resolve(&source);
-    let compiled = compile(&resolved);
+    let compiled = compile(&source);
 
     let mut json = serde_json::Map::new();
 
