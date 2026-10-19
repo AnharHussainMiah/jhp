@@ -83,9 +83,9 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, StatusCode
 }
 
 async fn handle_jhp(path: &Path, req: Request<Body>) -> Result<Response<Body>, StatusCode> {
-    let source = fs::read_to_string(path)
-        .await
-        .map_err(|_| StatusCode::NOT_FOUND)?;
+    // let source = fs::read_to_string(path)
+    //    .await
+    //    .map_err(|_| StatusCode::NOT_FOUND)?;
 
     let resolved = includes::resolve(&format!("{}", path.display()));
     let processed = process_jhp(&resolved, req).await?;
