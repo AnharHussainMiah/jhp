@@ -87,7 +87,6 @@ async fn handle_jhp(path: &Path, req: Request<Body>) -> Result<Response<Body>, S
         .await
         .map_err(|_| StatusCode::NOT_FOUND)?;
 
-
     let resolved = includes::resolve(&format!("{}", path.display()));
     let processed = process_jhp(&resolved, req).await?;
 
