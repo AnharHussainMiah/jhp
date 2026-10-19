@@ -1,0 +1,90 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+        
+      - name: Build
+        run: cargo build --release
+
+      - name: Rename binary
+        run: |
+          mkdir dist
+          cp target/release/jhp dist/jhp
+          chmod +x dist/jhp
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-binary
+          path: dist/jhp
+
+  build-macos:
+    name: Build macOS (x86_64)
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Rename binary
+        run: |
+          mkdir dist
+          cp target/release/jhp dist/jhp-x86_64-apple-darwin
+          chmod +x dist/jhp-x86_64-apple-darwin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-binary
+          path: dist/jhp-x86_64-apple-darwin
+
+  release:
+    name: Create GitHub Release
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-binary
+          path: dist
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos-binary
+          path: dist
+
+      - name: Display downloaded files
+        run: ls -lh dist
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/jhp
+            dist/jhp-x86_64-apple-darwin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
