@@ -298,7 +298,7 @@ $ cargo build --release
 If you happen to have the same compile target, then you can pick the latest version from the releases
 section:
 
-[todo]
+[Latest Precompiled (Linux/Mac) Releases](https://github.com/AnharHussainMiah/jhp/releases)
 
 ## Curl | Bash for the lazy
 
