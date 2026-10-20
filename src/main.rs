@@ -59,7 +59,16 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, StatusCode
         .map(|metadata| metadata.is_dir())
         .unwrap_or(false)
     {
-        file_path.push("index.html");
+        file_path.push("index.jhp");
+    }
+
+    // if the file path does not exist but we have a "global.jhp" on disk
+    // we should instead over ride the file_path with the global.jhp to handle it instead
+
+    let global_jhp: PathBuf = Path::new(ROOT).join("global.jhp");
+
+    if !file_path.exists() && global_jhp.exists() {
+        file_path = global_jhp;
     }
 
     if file_path
@@ -83,9 +92,9 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, StatusCode
 }
 
 async fn handle_jhp(path: &Path, req: Request<Body>) -> Result<Response<Body>, StatusCode> {
-    // let source = fs::read_to_string(path)
-    //    .await
-    //    .map_err(|_| StatusCode::NOT_FOUND)?;
+    if !path.exists() {
+        return Err(StatusCode::NOT_FOUND);
+    }
 
     let resolved = includes::resolve(&format!("{}", path.display()));
     let processed = process_jhp(&resolved, req).await?;
@@ -150,4 +159,10 @@ async fn process_jhp(source: &str, req: Request<Body>) -> Result<JHPResponse, St
     });
 
     Ok(jhp)
+}
+
+fn escape(s: &str) -> String {
+    s.replace('\\', "\\\\")
+        .replace('`', "\\`")
+        .replace("${", "\\${")
 }

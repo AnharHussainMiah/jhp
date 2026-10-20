@@ -6,6 +6,10 @@
 ![License](https://img.shields.io/badge/License-CCAI%20License%20v1.0-green)
 ![Release](https://img.shields.io/badge/Release-v0.1.0-pink)
 ![Language](https://img.shields.io/badge/Language-Rust-orange)
+![Arch: Single Binary](https://img.shields.io/badge/Arch-Single%20Binary-yellow)
+![Code: Human hand crafted](https://img.shields.io/badge/Code-Human%20hand%20crafted-blueviolet)
+
+<!-- ![VSCode Plugin: Manual install only](https://img.shields.io/badge/VSCode%20Plugin-Manual%20install%20only-blue) -->
 
 ## Kinda like PHP but with JavaScript instead...
 
@@ -19,7 +23,9 @@ On a semi serious note, `jhp` at the moment compiles down to around ~~3mb~~ 7mb,
 
 Using Node, Deno or Bun is kinda bad as well, with Node + Alpine its around 250mb, while Deno and Bun can be squeezed further to around 50mb, but that's still big!
 
-Size issues aside, the other main point is we get to use vanilla JavaScript on the server side, maybe this was what `nodejs` should've been like? 😂
+Size issues aside, the other main point is we get to use vanilla JavaScript on the server side template engine, maybe this was what `nodejs` should've been in the first place? 😂
+
+And unlike `php` everything is a fully self contained single binary, so no more messing around and integrating with Apache or Nginx.
 
 ## Ok enough talk, show me the code!
 
@@ -141,8 +147,8 @@ RESPONSE.status = 404;
 RESPONSE.headers["x-custom-header"] = "some custom value here";
 ```
 
-**Note:** doing `console.log` appends to the `RESPONSE.body` automatically, so this does not need to be mutated
-manually, unless you wanted to forcefully overide the template parsing.
+> [!NOTE]
+> doing `console.log` appends to the `RESPONSE.body` automatically, so this does not need to be mutated manually, unless you wanted to forcefully overide the template parsing. Generally you should never need to overwrite this manually.
 
 ## Host function: Logging
 
@@ -251,7 +257,14 @@ cyclic references and simply stops processing them if there are infinite cycles,
 don't need to worry about `include` vs `include_once` etc in `jhp`.
 
 > [!NOTE]
-> **IMPORTANT:** when pointing to a file you must use the "absolute" path from relative from the `public` folder. So for example if you had a file that was `public/lib/util.jhp` then that file would always be referenced as `<# lib/util.jhp #>`, this helps remove all the annoying issues in `php` when files are moved that end up breaking relative imports, hopefully this is way saner and consitent!
+> **IMPORTANT:** when pointing to a file you must use the "absolute" path that is relative to the `public` folder. So for example if you had a file that was `public/lib/util.jhp` then that file would always be referenced as `<# lib/util.jhp #>`, this helps remove all the annoying issues in `php` when files are moved that end up breaking relative imports, hopefully this is way saner and consitent!
+
+## Global Handler
+
+When building SPA _(Single Page Applications)_ they usually have "virtual pages" that are "links" to pages
+that don't actually exist for example `/user-account`, normally the SPA will hijack these links client side and then use the browser history API to add the link as visited. This works fine until these links are shared the page is refreshed, at this point the browser will try and fetch this page that doesn't actually exist.
+
+In `jhp` if you drop a `global.jhp` file into the root folder (the `public/` directory), then if a non existent path is requested `jhp` will internally call `global.jhp`. You can then use whatever routing logic you like e.g route back to `index.html`.
 
 ## Error screenshot
 
@@ -269,10 +282,11 @@ If your JavaScript has an error, then you'll get a glorious animated Amiga 500 `
 - [x] File I/O _(read, write, append)_
 - [x] Create host http get/post functions
 - [x] Handle "Import" Pragmas _(will need to recursively walk and handle cycle detection)_
+- [x] Global fallback handler something like `global.jhp`
 - [ ] Host database function _(probably PostgreSQL?)_
 
 In theory once all the above features are completed, `jhp` could realistically be used to build
-pretty much any fully featured Web Application. It would be tototally hilarious if someone used it to
+pretty much any fully featured Web Application. It would be really hilarious if someone used it to
 create something WordPress using `jhp`
 
 **Nice to Have**
@@ -284,7 +298,8 @@ create something WordPress using `jhp`
 
 ## Building from source
 
-This the method I'd recommend the most, built it from source, just clone this repo and use cargo.
+This the method I'd recommend the most, build it from source, just clone this repo and use cargo as
+usual.
 
 ```shell
 $ git clone https://github.com/AnharHussainMiah/jhp
@@ -302,7 +317,12 @@ section:
 
 ## Curl | Bash for the lazy
 
-If you're feeling super lazy, just curl bash:
+Before you curl bash, remember my video: [Curl Bash Installation aka "Trust me bro!"](https://www.youtube.com/watch?v=KKK2JBJ9QCc). I've taken care to keep the script as simple as possible, have a read and only
+if you're happy:
+
+```shell
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/AnharHussainMiah/jhp/refs/heads/main/install.sh | sh
+```
 
 [todo]
 
@@ -310,7 +330,7 @@ If you're feeling super lazy, just curl bash:
 
 ## Was AI used?
 
-Almost all the code was handwritten with rare exceptions: for example I used chatGPT to search for bits of boilerplate, for example I couldn't be bothered with bashing out the axum request handler code. I could have probably gotten the same boilerplate from the actual axum documentation, but it was too boring and tedious for me, oh and the logo that's Google Gemini, because I'm not a talented artist and its a placeholder for now. I hope at some point the logo can be done by a real artist.
+Almost all the code was handwritten with rare exceptions: I used chatGPT to search for bits of boilerplate, for example I couldn't be bothered with bashing out the axum request handler code. I could have probably gotten the same boilerplate from the actual axum documentation, but it was too boring and tedious for me, oh and the logo that's Google Gemini, because I'm not a talented artist and its a placeholder for now. I hope at some point the logo can be done by a real artist.
 
 You can tell if you read the codebase, it's not a bazillion lines of random code splattered all over the place, so no AI code vomit / slop here!
 
@@ -327,18 +347,22 @@ MacOS most likely will work fine given its a \*nix family _(assuming it compiles
 
 ## Hey it doesn't have host function X?
 
-raise a GitHub issue, if it's really popular I might be able to add it, or even better send in a PR!
+Raise a GitHub issue, if it's really popular I might be able to add it, or even better send in a PR!
 
 ## Can I use this in production?
 
-TL;DR **Don't**
+TL;DR **Don't?** unless you _really_ want to, do your own tests first.
 
 ## Contributions
 
 Always welcome, but just a few things:
 
-- You actually know Rust, please I don't want AI slop spam.
+- You actually know Rust, please I don't want to deal with AI slop code.
 - It has to be useful to a lot of people, not something that might be cool.
 - Please follow the existing codebase style! I like simple flat modules, with very little abstraction.
 - If you build a large feature, you own it.
-- I don't mind _some_ AI use if used tastefully, but as per the previous statement, I take the Linus Torvalds approach: you submit the code, you _own_ the code, that means if things break it's your responsibility.
+- I don't mind _some_ AI use if used tastefully, but as per the previous statement, I take the Linus Torvalds approach: the code your create is now your responsibility, if it breaks you have to fix it.
+
+## License
+
+Contextual Copyleft AI (CCAI) [License v1.0](license)

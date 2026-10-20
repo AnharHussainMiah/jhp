@@ -57,7 +57,7 @@ fn extract_includes(f: &str) -> Vec<Include> {
     // println!("DEBUG| attempting to extract '{}'", f);
 
     let content = slurp(f.to_string());
- 
+
     let chars: Vec<char> = content.chars().collect();
 
     let mut include_stack: Vec<Include> = Vec::new();
