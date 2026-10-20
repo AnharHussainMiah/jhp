@@ -23,7 +23,7 @@ On a semi serious note, `jhp` at the moment compiles down to around ~~3mb~~ 7mb,
 
 Using Node, Deno or Bun is kinda bad as well, with Node + Alpine its around 250mb, while Deno and Bun can be squeezed further to around 50mb, but that's still big!
 
-Size issues aside, the other main point is we get to use vanilla JavaScript on the server side template engine, maybe this was what `nodejs` should've been in the first place? 😂
+Size issues aside, the other main point is we get to use vanilla JavaScript on the server side as a template engine, maybe this was what `nodejs` should've been in the first place? 😂
 
 And unlike `php` everything is a fully self contained **single binary**, so no more messing around with Apache or Nginx.
 
