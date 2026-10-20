@@ -15,7 +15,7 @@
 
 I got up one morning thinking, us devs hate JavaScript and PHP, what if we combined them together so that we had something that worked just like PHP but with JavaScript as the templating language instead? and thus JHP was born!
 
-And works pretty much as you would expect it!
+And it works pretty much as you would expect it!
 
 ## But serioulsy why?!
 
@@ -25,7 +25,7 @@ Using Node, Deno or Bun is kinda bad as well, with Node + Alpine its around 250m
 
 Size issues aside, the other main point is we get to use vanilla JavaScript on the server side template engine, maybe this was what `nodejs` should've been in the first place? 😂
 
-And unlike `php` everything is a fully self contained single binary, so no more messing around and integrating with Apache or Nginx.
+And unlike `php` everything is a fully self contained **single binary**, so no more messing around with Apache or Nginx.
 
 ## Ok enough talk, show me the code!
 
@@ -317,8 +317,8 @@ section:
 
 ## Curl | Bash for the lazy
 
-Before you curl bash, remember my video: [Curl Bash Installation aka "Trust me bro!"](https://www.youtube.com/watch?v=KKK2JBJ9QCc). I've taken care to keep the script as simple as possible, have a read and only
-if you're happy:
+Before you curl bash, you might wanna my video first: [Curl Bash Installation aka "Trust me bro!"](https://www.youtube.com/watch?v=KKK2JBJ9QCc). I've taken care to keep the script as simple as possible, have a read and only
+if you're happy with my installer script:
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/AnharHussainMiah/jhp/refs/heads/main/install.sh | sh
