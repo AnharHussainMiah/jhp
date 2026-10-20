@@ -59,7 +59,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, StatusCode
         .map(|metadata| metadata.is_dir())
         .unwrap_or(false)
     {
-        file_path.push("index.jhp");
+        file_path.push("index.jhp"); // todo: may need to think about when an actual index.html exists e.g SPA
     }
 
     // if the file path does not exist but we have a "global.jhp" on disk
@@ -146,7 +146,7 @@ async fn process_jhp(source: &str, req: Request<Body>) -> Result<JHPResponse, St
     let bytes = to_bytes(req.into_body(), 1024 * 1024).await.unwrap(); // max body is 1MB
     let body = String::from_utf8(bytes.to_vec()).unwrap();
 
-    let compiled = format!("BODY = '{}';\n", body) + &compiled;
+    let compiled = format!("BODY = `{}`;\n", escape(&body)) + &compiled;
 
     let jhp = jhp::js(compiled.clone()).unwrap_or_else(|e| {
         let error = guru::error(&e.to_string());
