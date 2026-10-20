@@ -4,7 +4,7 @@
 
 ![OS](https://img.shields.io/badge/OS-Linux%20%7C%20Mac%20%7C%20WSL-blue)
 ![License](https://img.shields.io/badge/License-CCAI%20License%20v1.0-green)
-![Release](https://img.shields.io/badge/Release-v0.1.0-pink)
+![Release](https://img.shields.io/badge/Release-v0.2.0-pink)
 ![Language](https://img.shields.io/badge/Language-Rust-orange)
 ![Arch: Single Binary](https://img.shields.io/badge/Arch-Single%20Binary-yellow)
 ![Code: Human hand crafted](https://img.shields.io/badge/Code-Human%20hand%20crafted-blueviolet)
