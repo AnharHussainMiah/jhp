@@ -1,0 +1,33 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "JHP",
+    "scopeName": "text.html.jhp",
+    "fileTypes": [
+        "jhp"
+    ],
+    "patterns": [
+        {
+            "name": "comment.block.jhp",
+            "begin": "<\\?jhp",
+            "beginCaptures": {
+                "0": {
+                    "name": "punctuation.section.embedded.begin.jhp"
+                }
+            },
+            "end": "\\?>",
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.section.embedded.end.jhp"
+                }
+            },
+            "patterns": [
+                {
+                    "include": "source.js"
+                }
+            ]
+        },
+        {
+            "include": "text.html.basic"
+        }
+    ]
+}

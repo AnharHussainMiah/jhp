@@ -1,0 +1,32 @@
+{
+    "name": "jhp-syntax",
+    "displayName": "JHP Syntax Highlighting",
+    "version": "1.0.0",
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "jhp",
+                "aliases": [
+                    "JHP",
+                    "jhp"
+                ],
+                "extensions": [
+                    ".jhp"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "jhp",
+                "scopeName": "text.html.jhp",
+                "path": "./syntaxes/jhp.tmLanguage.json"
+            }
+        ]
+    }
+}
