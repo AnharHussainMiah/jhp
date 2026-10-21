@@ -291,7 +291,7 @@ create something WordPress using `jhp`
 
 **Nice to Have**
 
-- [ ] Visual Studio extension for `jhp`
+- [x] Visual Studio extension for `jhp`
 - [ ] Handle caching once parsed
 
 # Quick Start
@@ -317,14 +317,23 @@ section:
 
 ## Curl | Bash for the lazy
 
-Before you curl bash, you might wanna my video first: [Curl Bash Installation aka "Trust me bro!"](https://www.youtube.com/watch?v=KKK2JBJ9QCc). I've taken care to keep the script as simple as possible, have a read and only
+Before you curl bash, you might wanna watch my video first: [Curl Bash Installation aka "Trust me bro!"](https://www.youtube.com/watch?v=KKK2JBJ9QCc). I've taken care to keep the script as simple as possible, have a read and only
 if you're happy with my installer script:
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/AnharHussainMiah/jhp/refs/heads/main/install.sh | sh
 ```
 
-[todo]
+## Visual Studio Code plugin
+
+You can build the plugin from source it's under `vscode-plugin/` just run the `build.sh` script, or just grab
+the one here: [jhp.vsix](jhp.vsix) _(it's just in this root folder)_
+
+and then install manually e.g:
+
+```shell
+code --install-extension jhp.vsix
+```
 
 # FAQs
 
@@ -334,7 +343,7 @@ Almost all the code was handwritten with rare exceptions: I used chatGPT to sear
 
 You can tell if you read the codebase, it's not a bazillion lines of random code splattered all over the place, so no AI code vomit / slop here!
 
-The `license` is the new `Contextual Copyleft AI (CCAI) License v1.0`, because why should big tech hoover everything up without proper attribution? _(aka stealing)_. Isn't it amazing that it's totally fine for big tech to copy from everyon else, but when anyone tries to "distill" their models _(that they scraped from us)_ suddenly this is somehow a problem?!
+The `license` is the new `Contextual Copyleft AI (CCAI) License v1.0`, because why should big tech hoover everything up without proper attribution? _(aka stealing)_. Isn't it amazing that it's totally fine for big tech to copy from everyone else, but when anyone tries to "distill" their models _(that they scraped from us)_ suddenly this is somehow a problem?!
 
 ## Is JHP available for Windows/MacOS?
 
